@@ -2,28 +2,18 @@ import numpy as np
 
 
 def calc_expectations(h, w, values, chance):
-    # рекурсия запрещена не была :)
-    def first_rec(matrix, left):
-        current = np.roll(chance, left, axis=0)
-        current[0:left] = 0
-        matrix += current
-        if left + 1 < h:
-            matrix = first_rec(matrix, left + 1)
 
-        return matrix
+    sub_matric = np.zeros([chance.shape[0] + h - 1, chance.shape[1] + w - 1])
+    sub_matric[h - 1:, w - 1:] += chance
 
-    result_lines = first_rec(np.copy(chance), 1)
-    crutch = np.copy(result_lines)
+    sub_shape = (h, w)
+    view_shape = tuple(np.subtract(sub_matric.shape,
+                                   sub_shape) + 1) + sub_shape
+    sub_arrays = np.lib.stride_tricks.as_strided(sub_matric,
+                                                 view_shape,
+                                                 sub_matric.strides * 2)
+    sub_arrays = sub_arrays.reshape((-1,) + sub_shape)
 
-    def second_rec(matrix, left):
-        current = np.roll(crutch, left, axis=1)
-        current.T[0:left] = 0
-        matrix += current
-        if left + 1 < w:
-            matrix = second_rec(matrix, left + 1)
+    result = sub_arrays.sum(axis=1).sum(axis=1).reshape(chance.shape)
 
-        return matrix
-
-    result_total = second_rec(result_lines, 1)
-
-    return result_total * values
+    return result * values
