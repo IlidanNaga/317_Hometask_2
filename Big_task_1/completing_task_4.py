@@ -9,10 +9,12 @@ from skimage.transform import rotate
 from skimage.filters import gaussian
 from math import sqrt
 
-# so, the best algorithm is weighed cosine one
+# so, the best algorithms is weighed cosine one
 # with 4 folds
 # with rotate on -5 angle
 # with gaussian 1.1 filter
+# gaussian = 0.8 + anlge = -35
+# gaussian = 0.7 + angle = -35 + s_1 = 1 + s_2 = 2
 
 mnist = fetch_mldata("MNIST-original")
 data = mnist.data / 255.0
@@ -36,7 +38,7 @@ trX_s_2 = np.empty(trX.shape)
 teX_s_2 = np.empty(teX.shape)
 
 for enum in range(teX.__len__()):
-    teX_rotated[enum] = rotate(teX[enum], -35, preserve_range=True)
+    teX_rotated[enum] = rotate(teX[enum], -5, preserve_range=True)
     teX_filtred[enum] = gaussian(teX_rotated[enum], sqrt(0.8), preserve_range=True)
     teX_s_1[:, :-1, :] = teX_filtred[:, 1:, :]
     teX_s_2[:, :, :-2] = teX_s_1[:, :, 2:]
@@ -52,7 +54,8 @@ for enum in range(trX.__len__()):
 print("Modified_trX")
 
 teX = teX_s_2.reshape(teX_rotated.__len__(), 28 * 28)
-trX = trX_s_2.reshape(trX_rotated.__len__(), 28 * 28)
+trX = np.concatenate([trX.reshape(trX.__len__(), 28 * 28), trX_s_2.reshape(trX_rotated.__len__(), 28 * 28)], axis=0)
+trY = np.concatenate([trY, trY])
 
 model = KNNClassifier(4, "my_own", "cosine", True)
 
@@ -61,6 +64,6 @@ result = model.predict(teX)
 
 print("Accuracy of best method is: ", ac_s(teY, result))
 
-f = open("save_file_all_modifiers.txt", "w")
+f = open("save_file_5.txt", "w")
 for item in result:
     f.write(str(item))

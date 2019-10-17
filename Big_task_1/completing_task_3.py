@@ -28,8 +28,7 @@ result_non_weighted = knn_cross_val_score(sub_data,
                                     cv,
                                     strategy="my_own",
                                     metric="cosine",
-                                    weights=False,
-                                    test_block_size=0)
+                                    weights=False)
 
 result_weighted = knn_cross_val_score(sub_data,
                                     sub_target,

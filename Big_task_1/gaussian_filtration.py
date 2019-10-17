@@ -3,10 +3,11 @@ from time import time
 from math import sqrt
 from skimage.filters import gaussian
 
+from random import seed, shuffle
+
 import numpy as np
 
 from cross_validation import *
-
 
 
 mnist = fetch_mldata("MNIST-original")
