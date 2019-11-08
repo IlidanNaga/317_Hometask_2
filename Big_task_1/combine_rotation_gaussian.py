@@ -4,6 +4,8 @@ from math import sqrt
 from skimage.filters import gaussian
 from skimage.transform import rotate
 
+from random import seed, shuffle
+
 import numpy as np
 
 from cross_validation import *

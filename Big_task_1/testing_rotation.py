@@ -9,7 +9,6 @@ from time import time
 from cross_validation import *
 
 
-
 mnist = fetch_mldata("MNIST-original")
 data = mnist.data / 255.0
 target = mnist.target.astype("int0")
@@ -27,7 +26,7 @@ cv = kfold(3500, 5)
 hold = time()
 result_rot_0 = knn_cross_val_score(sub_data,
                                    sub_target,
-                                   [2, 3, 4, 5, 7],
+                                   [4],
                                    "accuracy",
                                    cv,
                                    strategy="my_own",
@@ -40,18 +39,21 @@ result_rot = []
 time_rot = []
 
 sub_data = sub_data.reshape(sub_data.__len__(), 28, 28)
+sub_target = np.concatenate([sub_target, sub_target])
 
-for rot_angle in [-15, -10, 5, 5, 10, 15]:
+for rot_angle in [-35, -25, -15, -10, 5, 5, 10, 15, 25, 35]:
     sub_data = sub_data.reshape(sub_data.__len__(), 28, 28)
     rotated_data = np.empty(sub_data.shape)
     for item in range(sub_data.__len__()):
         rotated_data[item] = skimage.transform.rotate(sub_data[item], rot_angle, preserve_range=True)
     rotated_data = rotated_data.reshape(rotated_data.__len__(), 28 * 28)
+    sub_data = sub_data.reshape(sub_data.__len__(), 28 * 28)
+    rotated_data = np.concatenate([rotated_data, sub_data], axis=0)
     print(rotated_data.shape)
     hold = time()
     result_rot.append(knn_cross_val_score(rotated_data,
                                           sub_target,
-                                          [2, 3, 4, 5, 7],
+                                          [4],
                                           "accuracy",
                                           cv,
                                           strategy="my_own",
@@ -71,14 +73,11 @@ print("With rotation 15: ", result_rot[5])
 # сдвиг на -10 градусов, кажется, работает лучше всего... надо посмотреть
 
 result_rot.append(result_rot_0)
-score = np.empty((7, 5))
+score = np.empty((11))
 
 for enum, item in enumerate(result_rot):
-    score[enum, 0] = np.sum(item[2])
-    score[enum, 1] = np.sum(item[3])
-    score[enum, 2] = np.sum(item[4])
-    score[enum, 3] = np.sum(item[5])
-    score[enum, 4] = np.sum(item[7])
+    score[enum] = np.sum(item[4])
+
 
 print(score)
 print(np.max(score))

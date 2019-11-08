@@ -55,8 +55,8 @@ def knn_cross_val_score(X, Y, k_list, score, cv, **kwargs):
 
     for enumer, fold in enumerate(cv):
 
-        trX, trY = X[fold[0]], Y[fold[0]]
-        teX, teY = X[fold[1]], Y[fold[1]]
+        trX, trY = X[fold[0]], Y[fold[0]].astype(int)
+        teX, teY = X[fold[1]], Y[fold[1]].astype(int)
 
         model = KNNClassifier(k=max_k, **kwargs)
         model.fit(trX, trY)

@@ -6,6 +6,8 @@ from skimage.transform import rotate
 
 import numpy as np
 
+from random import seed, shuffle
+
 from cross_validation import *
 
 # лучший - 30 набор

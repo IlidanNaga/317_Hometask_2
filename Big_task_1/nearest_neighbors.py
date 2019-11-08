@@ -81,31 +81,31 @@ class KNNClassifier:
 
         test_target = np.empty(X.__len__()).astype(int)
 
-        if self.test_block_size == 0:
+        if self.weights:
 
-            if self.weights:
+            distances, nearest = self.find_kneighbors(X, True)
 
-                distances, nearest = self.find_kneighbors(X, True)
+            for enum in range(X.__len__()):
+                cluster_nb = np.zeros(self.clusters_amount)
+                for numb, item in enumerate(nearest[enum]):
+                    cluster_nb[np.where(self.clusters ==
+                                        self.target[item])[0]] += weight_function(distances[enum, numb])
 
-                for enum in range(X.__len__()):
-                    cluster_nb = np.zeros(self.clusters_amount)
-                    for numb, item in enumerate(nearest[enum]):
-                        cluster_nb[np.where(self.clusters ==
-                                            self.target[item])[0]] += weight_function(distances[enum, numb])
+                test_target[enum] = self.clusters[np.argmax(cluster_nb)]
+        else:
+            nearest = self.find_kneighbors(X, False)
 
-                    test_target[enum] = self.clusters[np.argmax(cluster_nb)]
-            else:
-                nearest = self.find_kneighbors(X, False)
+            for enum in range(X.__len__()):
+                cluster_nb = np.zeros(self.clusters_amount).astype(int)
+                for numb, item in enumerate(nearest[enum]):
+                    cluster_nb[np.where(self.clusters ==
+                                        self.target[item])[0]] += 1
 
-                for enum in range(X.__len__()):
-                    cluster_nb = np.zeros(self.clusters_amount).astype(int)
-                    for numb, item in enumerate(nearest[enum]):
-                        cluster_nb[np.where(self.clusters ==
-                                            self.target[item])[0]] += 1
+                test_target[enum] = self.clusters[np.argmax(cluster_nb)]
 
-                    test_target[enum] = self.clusters[np.argmax(cluster_nb)]
+        return test_target
 
-            return test_target
+        """
         else:
 
             if self.weights:
@@ -150,3 +150,5 @@ class KNNClassifier:
                         test_target[enum + i * self.test_block_size] = self.clusters[np.argmax(cluster_nb)]
 
             return test_target
+
+"""
